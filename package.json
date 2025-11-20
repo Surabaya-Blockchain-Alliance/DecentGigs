@@ -1,0 +1,43 @@
+{
+  "name": "decentralize-market-place",
+  "version": "1.0.0",
+  "description": "Decentralize-Market-Place is an onchain job marketplace inspired by platforms like Freelancer, designed to drive real-world adoption of blockchain technology. This project leverages Cardano and Atala Prism to create a secure, transparent, and decentralized environment for job seekers and employers.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@headlessui/react": "^2.2.9",
+    "@meshsdk/core": "^1.9.0-beta.87",
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "class-variance-authority": "^0.7.1",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.554.0",
+    "next": "^16.0.3",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.6",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "5.9.3"
+  }
+}
