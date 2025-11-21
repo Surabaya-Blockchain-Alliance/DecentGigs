@@ -3,25 +3,49 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Textarea } from './ui/textarea';
 import { Separator } from './ui/separator';
-import { ArrowLeft, Download, Star, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Download, Star, CheckCircle, ArrowRight } from 'lucide-react';
 import { Job } from '../App';
 
 interface ReleaseApprovalProps {
   job: Job;
   onRelease: () => void;
   onBack: () => void;
+  isDarkMode: boolean; // Added for theme consistency
 }
 
-export function ReleaseApproval({ job, onRelease, onBack }: ReleaseApprovalProps) {
+const StarRating: React.FC<{ rating: number, setRating: (r: number) => void, isDarkMode: boolean }> = ({ rating, setRating, isDarkMode }) => {
+  return (
+    <div className="flex justify-center space-x-1">
+      {[1, 2, 3, 4, 5].map((index) => (
+        <Star
+          key={index}
+          className={`w-8 h-8 cursor-pointer transition-transform ${
+            index <= rating ? 'fill-yellow-500 text-yellow-500 scale-105' : isDarkMode ? 'text-white/30 hover:text-white/50' : 'text-gray-300 hover:text-gray-500'
+          }`}
+          onClick={() => setRating(index)}
+        />
+      ))}
+    </div>
+  );
+};
+
+export function ReleaseApproval({ job, onRelease, onBack, isDarkMode }: ReleaseApprovalProps) {
   const [rating, setRating] = useState(0);
   const [showReview, setShowReview] = useState(false);
 
+  const rootClass = isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-white text-gray-900';
+  const headerClass = isDarkMode ? 'bg-[#0a0a0a]/80 border-white/10' : 'bg-white/80 border-gray-200';
+  const cardClass = isDarkMode ? 'bg-white/5 border border-primary/30' : 'bg-gray-50 border border-gray-300';
+  const textMutedClass = isDarkMode ? 'text-white/70' : 'text-gray-500';
+  const inputClass = isDarkMode ? 'bg-white/10 border-white/30 text-white' : 'bg-gray-100 border-gray-300 text-gray-900';
+
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${rootClass} transition-colors`}>
       {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50">
+      <header className={`backdrop-blur-sm border-b sticky top-0 z-10 ${headerClass}`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={onBack}>
+          <Button variant="ghost" onClick={onBack} className={isDarkMode ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-200'}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Job
           </Button>
@@ -29,168 +53,97 @@ export function ReleaseApproval({ job, onRelease, onBack }: ReleaseApprovalProps
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <Card className="p-8 bg-card/50 backdrop-blur-sm border-primary/30">
+        <Card className={`p-8 rounded-xl shadow-xl ${cardClass}`}>
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary border border-primary/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary border border-primary/30 rounded-full mx-auto flex items-center justify-center mb-4">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-foreground">Review & Approve Work</h1>
-            <p className="text-muted-foreground mt-2">
-              {job.title}
-            </p>
+            <h1 className="text-3xl font-bold">Approve & Release Funds</h1>
+            <p className={textMutedClass}>Final step for job: "{job.title}"</p>
           </div>
 
-          {/* Deliverable */}
           <div className="space-y-6">
-            <div>
-              <h3 className="mb-4 text-foreground">Submitted Deliverable</h3>
-              <div className="border border-primary/20 bg-primary/5 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-4 gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 rounded-lg flex items-center justify-center">
-                      <Download className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-foreground">dashboard-final.zip</p>
-                      <p className="text-muted-foreground">2.4 MB</p>
-                    </div>
-                  </div>
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
+            {!showReview ? (
+              <>
+                <div className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-primary/10 border border-primary/30' : 'bg-primary/5 border border-primary/20'}`}>
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Download className="w-6 h-6 text-primary" />
+                    Work Submitted
+                  </h3>
+                  <p className={textMutedClass}>
+                    The freelancer has submitted the final work. Please review it carefully before proceeding.
+                  </p>
+                  <Button variant="outline" className={`w-full ${isDarkMode ? 'border-white/20 hover:bg-white/10' : 'border-gray-300 hover:bg-gray-200'}`}>
+                    Download/View Submitted Files
                   </Button>
                 </div>
 
-                <Separator className="my-4" />
-
-                <div>
-                  <h3 className="mb-2 text-foreground">IPFS Hash</h3>
-                  <div className="bg-input/30 border border-primary/30 rounded-lg p-3 font-mono break-all text-primary">
-                    QmX7ZfR3vXNPq5pXrTfGHa1b9cD8jK2mN4oP6qR7sT9uV5w
+                <div className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
+                  <h3 className="text-xl font-semibold mb-3">Escrow Details</h3>
+                  <div className="flex justify-between items-center border-b border-dashed pb-2">
+                    <span className={textMutedClass}>Total Escrowed</span>
+                    <span className="text-2xl font-bold text-primary">{job.budget} ADA</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className={textMutedClass}>Transaction Fee (0.5%)</span>
+                    <span className="font-semibold text-red-500">{job.budget * 0.005} ADA</span>
+                  </div>
+                  <Separator className={isDarkMode ? 'my-2 bg-white/20' : 'my-2 bg-gray-300'} />
+                  <div className="flex justify-between items-center text-lg">
+                    <span className="font-semibold">Net Release to Freelancer</span>
+                    <span className="font-extrabold text-green-500">{(job.budget * 0.995).toFixed(2)} ADA</span>
                   </div>
                 </div>
 
-                <Separator className="my-4" />
-
-                <div>
-                  <h3 className="mb-2 text-foreground">Delivery Notes</h3>
-                  <p className="text-muted-foreground">
-                    I've completed the React dashboard with all requested features. The dashboard includes:
-                    - Responsive design for mobile and desktop
-                    - Chart integration with Recharts
-                    - Dark mode support
-                    - All components are well documented
-                    
-                    Installation instructions are included in the README.md file.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Escrow Details */}
-            <div>
-              <h3 className="mb-4 text-foreground">Escrow Details</h3>
-              <div className="border border-secondary/20 bg-secondary/5 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount Locked:</span>
-                  <span className="text-primary">{job.budget} ADA</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Freelancer:</span>
-                  <span className="text-foreground">{job.freelancer}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Contract Address:</span>
-                  <span className="font-mono text-foreground">addr1vxy...abc123</span>
-                </div>
-              </div>
-            </div>
-
-            {!showReview ? (
-              <div className="flex gap-3">
-                <Button onClick={() => setShowReview(true)} className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-                  Approve & Release Funds
+                <Button 
+                  onClick={() => setShowReview(true)} 
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                >
+                  Confirm Review & Proceed to Rating
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-                <Button variant="outline" onClick={onBack}>
-                  Request Changes
-                </Button>
-              </div>
+              </>
             ) : (
+              // Review and Rating Step
               <>
-                {/* Rating */}
-                <div>
-                  <h3 className="mb-4 text-foreground">Rate Freelancer</h3>
-                  <div className="flex gap-2 justify-center mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setRating(star)}
-                        className="transition-colors"
-                      >
-                        <Star 
-                          className={`w-8 h-8 ${
-                            star <= rating ? 'fill-secondary text-secondary' : 'text-muted-foreground'
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-center text-muted-foreground">
-                    {rating === 0 && 'Select a rating'}
-                    {rating === 1 && 'Poor'}
-                    {rating === 2 && 'Fair'}
-                    {rating === 3 && 'Good'}
-                    {rating === 4 && 'Very Good'}
-                    {rating === 5 && 'Excellent'}
-                  </p>
-                </div>
+                <h2 className="text-2xl font-semibold mb-4 text-center">Rate the Freelancer</h2>
+                <p className={textMutedClass + ' text-center mb-6'}>Your rating will update their on-chain reputation score.</p>
+                
+                <StarRating rating={rating} setRating={setRating} isDarkMode={isDarkMode} />
 
-                {/* Review */}
-                <div className="space-y-2">
-                  <h3 className="text-foreground">Leave a Review (Optional)</h3>
-                  <Textarea 
-                    placeholder="Share your experience working with this freelancer..."
-                    rows={4}
-                    className="bg-input/30"
-                  />
-                  <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-3">
-                    <div className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0 text-secondary" />
-                      <p className="text-muted-foreground">
-                        Reviews are ZK-protected: Your feedback is cryptographically verified while maintaining privacy
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <Textarea placeholder="Leave a public review for the freelancer..." rows={5} className={`mt-4 ${inputClass}`} />
 
-                {/* Confirmation */}
-                <div className="bg-secondary/20 border border-secondary/40 rounded-lg p-6">
-                  <h3 className="mb-3 text-foreground">What happens next?</h3>
+                <div className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-primary/10 border border-primary/30' : 'bg-primary/5 border border-primary/20'}`}>
+                  <h3 className="font-semibold text-lg flex items-center gap-2">Transaction Effects</h3>
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0 text-secondary" />
-                      <p className="text-muted-foreground">Funds ({job.budget} ADA) will be released from escrow to freelancer</p>
+                      <CheckCircle className="w-5 h-5 flex-shrink-0 text-primary" />
+                      <p className={textMutedClass}>Escrow funds will be released to freelancer</p>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 flex-shrink-0 text-secondary" />
-                      <p className="text-muted-foreground">Freelancer's reputation score will be updated</p>
+                      <p className={textMutedClass}>Freelancer's reputation score will be updated</p>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 flex-shrink-0 text-secondary" />
-                      <p className="text-muted-foreground">Transaction will be recorded on Cardano blockchain</p>
+                      <p className={textMutedClass}>Transaction will be recorded on Cardano blockchain</p>
                     </div>
                     <div className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 flex-shrink-0 text-secondary" />
-                      <p className="text-muted-foreground">Both parties can leave feedback (visible after both submit)</p>
+                      <p className={textMutedClass}>Both parties can leave feedback (visible after both submit)</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <Button onClick={onRelease} className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90" disabled={rating === 0}>
+                  <Button 
+                    onClick={onRelease} 
+                    className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90" 
+                    disabled={rating === 0}
+                  >
                     Confirm & Release {job.budget} ADA
                   </Button>
-                  <Button variant="outline" onClick={() => setShowReview(false)}>
+                  <Button variant="outline" onClick={() => setShowReview(false)} className={isDarkMode ? 'border-white/20 hover:bg-white/10' : 'border-gray-300 hover:bg-gray-200'}>
                     Cancel
                   </Button>
                 </div>

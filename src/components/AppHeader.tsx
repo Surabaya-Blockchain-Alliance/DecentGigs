@@ -6,11 +6,14 @@ import React from "react";
 interface AppHeaderProps {
   onGetStarted: () => void;
   onShowProfile: () => void;
+  isDarkMode: boolean;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onGetStarted, onShowProfile }) => (
+export const AppHeader: React.FC<AppHeaderProps> = ({ onGetStarted, onShowProfile, isDarkMode }) => (
   <motion.header
-    className="border-b border-border/50 backdrop-blur-sm"
+    className={`border-b backdrop-blur-sm transition-colors sticky top-0 z-10 ${
+      isDarkMode ? 'border-white/10 bg-[#0a0a0a]/80' : 'border-gray-200 bg-white/80'
+    }`}
     initial={{ y: -40, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 0.7, ease: "easeOut" }}
@@ -26,12 +29,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onGetStarted, onShowProfil
           >
             <Sparkles className="w-5 h-5 text-white" />
           </button>
-          <span className="text-foreground">
+          <span className={isDarkMode ? 'text-white font-semibold' : 'text-gray-900 font-semibold'}>
             WorPlace Around
           </span>
         </div>
         <Button variant="outline" onClick={onGetStarted}>
-          Connect Wallet
+          Get Started
         </Button>
       </div>
     </div>

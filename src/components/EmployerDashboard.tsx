@@ -10,10 +10,12 @@ import { Job } from '../App';
 
 interface EmployerDashboardProps {
   onJobSelect: (job: Job) => void;
+  isDarkMode: boolean; // Added for theme consistency
 }
 
-export function EmployerDashboard({ onJobSelect }: EmployerDashboardProps) {
+export function EmployerDashboard({ onJobSelect, isDarkMode }: EmployerDashboardProps) {
   const [showCreateJob, setShowCreateJob] = useState(false);
+  const [newJob, setNewJob] = useState({ title: '', description: '', budget: 0 });
 
   const mockJobs: Job[] = [
     {
@@ -41,175 +43,137 @@ export function EmployerDashboard({ onJobSelect }: EmployerDashboardProps) {
       budget: 300,
       status: 'completed',
       employer: 'addr1qxy...',
-      freelancer: 'addr1xyz...',
+      freelancer: 'addr1def...',
     },
   ];
 
+  const rootClass = isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-white text-gray-900';
+  const cardClass = isDarkMode ? 'bg-white/5 border border-primary/30' : 'bg-gray-50 border border-gray-300';
+  const jobCardClass = isDarkMode ? 'bg-white/5 backdrop-blur-sm border-primary/20 hover:border-primary/50' : 'bg-white border-gray-200 hover:border-primary/50';
+  const textForegroundClass = isDarkMode ? 'text-white' : 'text-gray-900';
+  const textMutedClass = isDarkMode ? 'text-white/70' : 'text-gray-500';
+  const inputClass = isDarkMode ? 'bg-white/10 border-white/30 text-white' : 'bg-gray-100 border-gray-300 text-gray-900';
+
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-foreground">Employer Dashboard</h2>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 border border-primary/30 bg-primary/5 rounded-lg">
-                <Wallet className="w-4 h-4 text-primary" />
-                <span className="text-foreground">125.5 ADA</span>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-full" />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
+    <div className={`min-h-screen ${rootClass} transition-colors`}>
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Active Jobs</p>
-                <h2 className="text-foreground">3</h2>
-              </div>
-              <FileText className="w-8 h-8 text-primary/50" />
-            </div>
+        <h1 className="text-4xl font-extrabold mb-8 flex items-center gap-3">
+          <Sparkles className="w-8 h-8 text-secondary" />
+          Employer Dashboard
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className={`p-6 ${cardClass}`}>
+            <Wallet className="w-6 h-6 text-primary mb-3" />
+            <p className={textMutedClass}>Escrow Balance</p>
+            <h2 className="text-3xl font-bold">1,800 ADA</h2>
           </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-secondary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Total Bids</p>
-                <h2 className="text-foreground">23</h2>
-              </div>
-              <Clock className="w-8 h-8 text-secondary/50" />
-            </div>
+          <Card className={`p-6 ${cardClass}`}>
+            <FileText className="w-6 h-6 text-primary mb-3" />
+            <p className={textMutedClass}>Total Jobs Posted</p>
+            <h2 className="text-3xl font-bold">12</h2>
           </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">In Progress</p>
-                <h2 className="text-foreground">1</h2>
-              </div>
-              <Clock className="w-8 h-8 text-primary/50" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-secondary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Completed</p>
-                <h2 className="text-foreground">8</h2>
-              </div>
-              <CheckCircle className="w-8 h-8 text-secondary/50" />
-            </div>
+          <Card className={`p-6 ${cardClass}`}>
+            <Clock className="w-6 h-6 text-primary mb-3" />
+            <p className={textMutedClass}>Avg Time to Hire</p>
+            <h2 className="text-3xl font-bold">2.4 Days</h2>
           </Card>
         </div>
 
-        {/* Action Bar */}
-        <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search your jobs..." className="pl-10 bg-input/30" />
-            </div>
-          </div>
-          <Button onClick={() => setShowCreateJob(!showCreateJob)} className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Job
+        <div className="mb-8">
+          <Button 
+            className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+            onClick={() => setShowCreateJob(!showCreateJob)}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            {showCreateJob ? 'Cancel Job Creation' : 'Post New Job'}
           </Button>
         </div>
 
-        {/* Create Job Form */}
         {showCreateJob && (
-          <Card className="p-6 mb-6 bg-card/50 backdrop-blur-sm border-primary/30">
-            <h3 className="mb-4 text-foreground">Create New Job</h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-foreground">Job Title</Label>
-                <Input placeholder="e.g. Build a responsive landing page" className="bg-input/30" />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-foreground">Description</Label>
-                <Textarea 
-                  placeholder="Describe the project requirements, deliverables, and timeline..."
-                  rows={4}
-                  className="bg-input/30"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-foreground">Budget (ADA)</Label>
-                  <Input type="number" placeholder="500" className="bg-input/30" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground">Category</Label>
-                  <Input placeholder="Development" className="bg-input/30" />
-                </div>
-              </div>
-
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-foreground">Listing Fee: 2 ADA</p>
-                    <p className="text-muted-foreground">Jobs appear instantly on-chain</p>
-                  </div>
-                  <div className="px-4 py-2 border border-primary bg-primary/20 rounded-lg text-primary">
-                    2 ADA
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90">Pay & Publish Job</Button>
-                <Button variant="outline" onClick={() => setShowCreateJob(false)}>
-                  Cancel
-                </Button>
-              </div>
+          <Card className={`p-8 mb-8 space-y-4 ${cardClass}`}>
+            <h2 className="text-2xl font-semibold mb-4">Create New Job Posting</h2>
+            <div>
+              <Label htmlFor="title" className={textForegroundClass}>Job Title</Label>
+              <Input 
+                id="title" 
+                placeholder="e.g., Build a Plutus Validator" 
+                className={`mt-1 ${inputClass}`}
+                onChange={(e) => setNewJob({...newJob, title: e.target.value})}
+              />
             </div>
+            <div>
+              <Label htmlFor="description" className={textForegroundClass}>Description</Label>
+              <Textarea 
+                id="description" 
+                placeholder="Detailed description of the required work..." 
+                rows={5} 
+                className={`mt-1 ${inputClass}`}
+                onChange={(e) => setNewJob({...newJob, description: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="budget" className={textForegroundClass}>Budget (ADA)</Label>
+              <Input 
+                id="budget" 
+                type="number" 
+                placeholder="e.g., 500" 
+                className={`mt-1 ${inputClass}`}
+                onChange={(e) => setNewJob({...newJob, budget: parseFloat(e.target.value) || 0})}
+              />
+            </div>
+            <Button className="bg-gradient-to-r from-secondary to-primary hover:opacity-90">
+              Post Job & Escrow Funds
+            </Button>
           </Card>
         )}
 
-        {/* Jobs List */}
-        <div className="space-y-4">
-          <h3 className="text-foreground">Your Jobs</h3>
-          {mockJobs.map((job) => (
+        {/* Job Listings */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Your Posted Jobs</h2>
+            <div className="relative">
+              <Input placeholder="Search jobs..." className={`pl-10 ${inputClass}`} />
+              <Search className={`w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 ${textMutedClass}`} />
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            {mockJobs.map((job) => (
             <Card 
               key={job.id}
-              className="p-6 cursor-pointer bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all"
+              className={`p-6 cursor-pointer transition-all ${jobCardClass}`}
               onClick={() => onJobSelect(job)}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <h3 className="text-foreground">{job.title}</h3>
+                    <h3 className={textForegroundClass}>{job.title}</h3>
                     <Badge variant={
                       job.status === 'open' ? 'default' : 
                       job.status === 'in-progress' ? 'secondary' : 
                       'outline'
-                    }>
+                    } className={`capitalize ${isDarkMode ? '' : 'text-gray-900 border-gray-300'}`}>
                       {job.status}
                     </Badge>
                   </div>
-                  <p className="text-muted-foreground mb-3">{job.description}</p>
-                  <div className="flex items-center gap-6 text-muted-foreground flex-wrap">
-                    <span className="text-primary">{job.budget} ADA</span>
-                    {job.bids && <span>{job.bids} Bids</span>}
-                    {job.freelancer && <span>Freelancer: {job.freelancer.slice(0, 12)}...</span>}
+                  <p className={textMutedClass + ' mb-3'}>{job.description}</p>
+                  <div className={`flex items-center gap-6 flex-wrap ${textMutedClass}`}>
+                    <span className="text-primary font-semibold">{job.budget} ADA</span>
+                    {job.bids && <span className={textMutedClass}>{job.bids} Bids</span>}
+                    {job.freelancer && <span className={textMutedClass}>Freelancer: {job.freelancer.slice(0, 12)}...</span>}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-lg" />
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-primary/80" />
+                </div>
               </div>
             </Card>
           ))}
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

@@ -10,10 +10,12 @@ import { Job } from '../App';
 interface DisputeResolutionProps {
   job: Job;
   onBack: () => void;
+  isDarkMode: boolean;
 }
 
-export function DisputeResolution({ job, onBack }: DisputeResolutionProps) {
+export function DisputeResolution({ job, onBack, isDarkMode }: DisputeResolutionProps) {
   const [disputeStep, setDisputeStep] = useState<'file' | 'pending' | 'voting'>('file');
+  const [vote, setVote] = useState<'employer' | 'freelancer' | null>(null);
 
   const juryVotes = [
     { id: '1', juror: 'addr1abc...', vote: 'employer', reputation: 4.9 },
@@ -23,236 +25,147 @@ export function DisputeResolution({ job, onBack }: DisputeResolutionProps) {
     { id: '5', juror: 'addr1mno...', vote: null, reputation: 4.9 },
   ];
 
+  const rootClass = isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-white text-gray-900';
+  const headerClass = isDarkMode ? 'bg-[#0a0a0a]/80 border-white/10' : 'bg-white/80 border-gray-200';
+  const cardClass = isDarkMode ? 'bg-white/5 border border-primary/30' : 'bg-gray-50 border border-gray-300';
+  const textMutedClass = isDarkMode ? 'text-white/70' : 'text-gray-500';
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${rootClass} transition-colors`}>
       {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50">
+      <header className={`backdrop-blur-sm border-b sticky top-0 z-10 ${headerClass}`}>
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={onBack}>
+          <Button variant="ghost" onClick={onBack} className={isDarkMode ? 'text-white hover:bg-white/10' : 'text-gray-900 hover:bg-gray-200'}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Job
           </Button>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <Card className="p-8 bg-card/50 backdrop-blur-sm border-destructive/30">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 border-2 border-destructive rounded-full flex items-center justify-center mx-auto mb-4 bg-destructive/10">
-              <AlertCircle className="w-8 h-8 text-destructive" />
-            </div>
-            <h1 className="text-foreground">Dispute Resolution</h1>
-            <p className="text-muted-foreground mt-2">
-              {job.title}
-            </p>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 flex items-center gap-3">
+            <Scale className="w-8 h-8 text-primary" />
+            Dispute Resolution for "{job.title}"
+        </h1>
+        
+        <Card className={`p-8 rounded-xl shadow-xl space-y-6 ${cardClass}`}>
+          <div className="text-center space-y-2">
+            <Badge variant="destructive" className="text-sm px-3 py-1 mb-4">DISPUTE ACTIVE</Badge>
+            <p className={textMutedClass}>Escrow is currently locked in the Aiken smart contract.</p>
           </div>
 
-          {/* File Dispute */}
+          {/* Dispute Filing Step */}
           {disputeStep === 'file' && (
             <div className="space-y-6">
-              <div className="bg-secondary/20 border border-secondary/40 rounded-lg p-6">
-                <h3 className="mb-2 text-foreground">Before Opening a Dispute</h3>
-                <p className="text-muted-foreground">
-                  Disputes should be used as a last resort. We recommend trying to resolve issues directly with the other party first. 
-                  Opening a dispute will involve community jury members who will vote on the outcome.
-                </p>
-              </div>
-
-              <div>
-                <h3 className="mb-4 text-foreground">Why are you opening a dispute?</h3>
-                <div className="space-y-3">
-                  <button className="w-full text-left border-2 border-primary/30 bg-primary/5 rounded-lg p-4 hover:border-primary/50 transition-all">
-                    <h3 className="text-foreground">Work not delivered as described</h3>
-                    <p className="text-muted-foreground">The deliverables don't match the job requirements</p>
-                  </button>
-                  <button className="w-full text-left border-2 border-primary/30 bg-primary/5 rounded-lg p-4 hover:border-primary/50 transition-all">
-                    <h3 className="text-foreground">Quality issues</h3>
-                    <p className="text-muted-foreground">The work quality is below acceptable standards</p>
-                  </button>
-                  <button className="w-full text-left border-2 border-primary/30 bg-primary/5 rounded-lg p-4 hover:border-primary/50 transition-all">
-                    <h3 className="text-foreground">Communication breakdown</h3>
-                    <p className="text-muted-foreground">Unable to reach agreement with the other party</p>
-                  </button>
-                  <button className="w-full text-left border-2 border-primary/30 bg-primary/5 rounded-lg p-4 hover:border-primary/50 transition-all">
-                    <h3 className="text-foreground">Payment not released</h3>
-                    <p className="text-muted-foreground">Work completed but employer won't release funds</p>
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-foreground">Explain Your Case</h3>
-                <Textarea 
-                  placeholder="Provide detailed explanation with evidence, screenshots, or communication logs..."
-                  rows={6}
-                  className="bg-input/30"
-                />
-              </div>
-
-              <div>
-                <h3 className="mb-4 text-foreground">Evidence (Optional)</h3>
-                <div className="border-2 border-dashed border-primary/30 bg-primary/5 rounded-lg p-8 text-center">
-                  <h3 className="mb-2 text-foreground">Upload Supporting Documents</h3>
-                  <p className="text-muted-foreground mb-4">Screenshots, files, or other evidence</p>
-                  <Button variant="outline">Choose Files</Button>
-                </div>
-              </div>
-
-              <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-4">
-                <h3 className="mb-2 text-foreground">How Disputes Work</h3>
-                <div className="space-y-2 text-muted-foreground">
-                  <p>• A jury of 5 verified community members will be selected randomly</p>
-                  <p>• Both parties present their case with evidence</p>
-                  <p>• Jury members vote on the outcome</p>
-                  <p>• Majority decision wins (3+ votes needed)</p>
-                  <p>• Escrow funds distributed according to jury decision</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button onClick={() => setDisputeStep('pending')} className="flex-1 bg-gradient-to-r from-destructive to-destructive/80 hover:opacity-90">
-                  File Dispute
-                </Button>
-                <Button variant="outline" onClick={onBack}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Pending State */}
-          {disputeStep === 'pending' && (
-            <div className="space-y-6">
-              <div className="bg-primary/20 border border-primary/40 rounded-lg p-6 text-center">
-                <Users className="w-16 h-16 text-primary mx-auto mb-4" />
-                <h3 className="mb-2 text-foreground">Dispute Filed Successfully</h3>
-                <p className="text-muted-foreground">
-                  Selecting jury members from verified community pool...
-                </p>
-                <div className="mt-4">
-                  <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                </div>
-              </div>
-
-              <div>
-                <h3 className="mb-4 text-foreground">Your Submission</h3>
-                <div className="border border-primary/20 bg-primary/5 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3 gap-4 flex-wrap">
-                    <h3 className="text-foreground">Work not delivered as described</h3>
-                    <Badge className="bg-primary/20 text-primary border-primary/30">Filed</Badge>
-                  </div>
-                  <p className="text-muted-foreground">
-                    The delivered dashboard is missing several key features that were specified in the job requirements, 
-                    including the analytics section and the user management panel...
+              <h2 className="text-xl font-semibold">File Your Case</h2>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-destructive mt-1" />
+                  <p className={isDarkMode ? 'text-white/80' : 'text-gray-700'}>
+                      Provide a detailed, neutral explanation of the issue and why the funds should be released (or returned).
                   </p>
-                </div>
               </div>
 
-              <div>
-                <h3 className="mb-4 text-foreground">Escrow Status</h3>
-                <div className="border border-secondary/20 bg-secondary/5 rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Locked Amount:</span>
-                    <span className="text-primary">{job.budget} ADA</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status:</span>
-                    <Badge variant="secondary">Frozen - Dispute Active</Badge>
-                  </div>
-                </div>
+              <div className="space-y-4">
+                  <Textarea placeholder="Explain your position and provide evidence links..." rows={8} />
+                  <Button 
+                    className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                    onClick={() => setDisputeStep('pending')}
+                  >
+                      Submit Case to Jury Pool
+                  </Button>
               </div>
-
-              <Button onClick={() => setDisputeStep('voting')} className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-                View Jury Selection (Demo)
-              </Button>
             </div>
           )}
 
-          {/* Voting State */}
-          {disputeStep === 'voting' && (
+          {/* Pending / Jury Voting Step */}
+          {(disputeStep === 'pending' || disputeStep === 'voting') && (
             <div className="space-y-6">
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Scale className="w-6 h-6 text-primary" />
-                  <h3 className="text-foreground">Jury Voting in Progress</h3>
+              <h2 className="text-xl font-semibold mb-4">Jury Voting In Progress</h2>
+
+              <div className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
+                <div className="flex items-center gap-3 text-lg font-medium">
+                    <Users className="w-6 h-6 text-primary" />
+                    <span className={isDarkMode ? 'text-white' : 'text-gray-800'}>Jury Panel Status</span>
                 </div>
-                <p className="text-muted-foreground">
-                  5 jury members have been selected and are reviewing the case
-                </p>
-              </div>
-
-              <div>
-                <h3 className="mb-4 text-foreground">Dispute Summary</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="border border-primary/20 bg-primary/5 rounded-lg p-4">
-                    <p className="text-muted-foreground mb-1">Employer</p>
-                    <p className="font-mono text-foreground">{job.employer.slice(0, 15)}...</p>
-                  </div>
-                  <div className="border border-secondary/20 bg-secondary/5 rounded-lg p-4">
-                    <p className="text-muted-foreground mb-1">Freelancer</p>
-                    <p className="font-mono text-foreground">{job.freelancer?.slice(0, 15)}...</p>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="mb-4 text-foreground">Jury Votes</h3>
-                <div className="space-y-3">
-                  {juryVotes.map((vote) => (
-                    <div key={vote.id} className="border border-primary/20 bg-primary/5 rounded-lg p-4">
-                      <div className="flex items-center justify-between gap-4 flex-wrap">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-full" />
-                          <div>
-                            <p className="font-mono text-foreground">{vote.juror}</p>
-                            <p className="text-muted-foreground">⭐ {vote.reputation} reputation</p>
-                          </div>
-                        </div>
-                        <div>
-                          {vote.vote === null ? (
-                            <Badge variant="outline">Pending</Badge>
-                          ) : vote.vote === 'employer' ? (
-                            <Badge variant="secondary">Voted: Employer</Badge>
-                          ) : (
-                            <Badge className="bg-primary/20 text-primary border-primary/30">Voted: Freelancer</Badge>
-                          )}
-                        </div>
+                
+                <ul className="space-y-2">
+                  {juryVotes.map((j) => (
+                    <li key={j.id} className="flex items-center justify-between p-3 rounded-md transition-colors border border-dashed border-border/50">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-mono text-sm ${isDarkMode ? 'text-white/80' : 'text-gray-700'}`}>{j.juror.slice(0, 16)}...</span>
+                        <Badge variant="secondary" className="text-xs">Rep: {j.reputation}</Badge>
                       </div>
-                    </div>
+                      <span className={`font-semibold ${
+                          j.vote === 'employer' ? 'text-red-500' : 
+                          j.vote === 'freelancer' ? 'text-green-500' : 
+                          textMutedClass
+                      }`}>
+                          {j.vote ? `Voted for ${j.vote}` : 'Pending Vote'}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
-              <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-4">
-                <h3 className="mb-3 text-foreground">Current Tally</h3>
+              {/* Only show the voting UI if it's the 'voting' step and the user is a juror */}
+              {disputeStep === 'voting' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Your Decision (As a Juror)</h3>
+                  <p className={textMutedClass}>Vote on the outcome to ensure a fair resolution.</p>
+                  <div className="flex gap-4">
+                    <Button 
+                      className={`flex-1 ${vote === 'employer' ? 'bg-red-500 hover:bg-red-600' : 'bg-primary/20 hover:bg-primary/30'} ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                      onClick={() => setVote('employer')}
+                    >
+                      Side with Employer
+                    </Button>
+                    <Button 
+                      className={`flex-1 ${vote === 'freelancer' ? 'bg-green-500 hover:bg-green-600' : 'bg-primary/20 hover:bg-primary/30'} ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                      onClick={() => setVote('freelancer')}
+                    >
+                      Side with Freelancer
+                    </Button>
+                  </div>
+                  {vote && (
+                    <Button 
+                      className="w-full bg-gradient-to-r from-secondary to-primary hover:opacity-90"
+                      onClick={() => { /* Mock submission */ setDisputeStep('pending'); }}
+                    >
+                      Submit Final Vote for {vote.toUpperCase()}
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {/* Status Summary */}
+              <div className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}`}>
+                <h3 className="text-lg font-semibold">Current Vote Tally</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Votes for Employer:</span>
-                    <span className="text-foreground">1 vote</span>
+                    <span className={textMutedClass}>Votes for Employer:</span>
+                    <span className="font-semibold text-red-400">1 vote</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Votes for Freelancer:</span>
-                    <span className="text-foreground">2 votes</span>
+                    <span className={textMutedClass}>Votes for Freelancer:</span>
+                    <span className="font-semibold text-green-400">2 votes</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Pending:</span>
-                    <span className="text-foreground">2 votes</span>
+                    <span className={textMutedClass}>Pending:</span>
+                    <span className="font-semibold">{juryVotes.filter(j => j.vote === null).length} votes</span>
                   </div>
-                  <Separator className="my-2" />
-                  <p className="text-muted-foreground">3 votes needed for majority decision</p>
+                  <Separator className={isDarkMode ? 'my-2 bg-white/20' : 'my-2 bg-gray-300'} />
+                  <p className={textMutedClass}>3 votes needed for majority decision</p>
                 </div>
               </div>
 
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <p className="text-muted-foreground">
+              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-primary/10 border border-primary/30' : 'bg-primary/5 border border-primary/20'}`}>
+                <p className={isDarkMode ? 'text-white/80' : 'text-gray-700'}>
                   You will be notified when all jury members have voted. The majority decision will be final and the escrow 
                   will be distributed accordingly.
                 </p>
               </div>
 
-              <Button variant="outline" onClick={onBack} className="w-full">
+              <Button variant="outline" onClick={onBack} className={`w-full ${isDarkMode ? 'border-white/20 hover:bg-white/10' : 'border-gray-300 hover:bg-gray-200'}`}>
                 Back to Job
               </Button>
             </div>
