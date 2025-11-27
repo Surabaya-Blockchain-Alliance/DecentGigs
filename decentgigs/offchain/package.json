@@ -1,0 +1,25 @@
+{
+  "name": "decentgigs-contract",
+  "version": "1.0.0",
+  "description": "DecentGigs Escrow Smart Contract on Cardano",
+  "type": "module",
+  "scripts": {
+    "build": "aiken build",
+    "test": "aiken test",
+    "test:vodka": "node tests/vodka.test.js",
+    "deploy": "node scripts/deploy.js",
+    "create-job": "node scripts/create-job.js",
+    "release-payment": "node scripts/release-payment.js",
+    "cancel-job": "node scripts/cancel-job.js",
+    "check-balance": "node scripts/check-balance.js"
+  },
+  "dependencies": {
+    "@lucid-evolution/lucid": "^0.3.36",
+    "@lucid-evolution/provider": "^0.1.3",
+    "@sidan-lab/vodka": "^0.6.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0"
+  }
+}
