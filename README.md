@@ -44,11 +44,7 @@ Everything that matters lives on Cardano. No databases, no admins, no custody.
 ## Smart Contracts (Aiken)
 ```
 /contracts/
-  escrow.ak
-  milestone.ak
-  reputation.ak
-  dispute.ak
-  proof_of_work.ak
+  decentgigs.ak
 ```
 
 ## Public On-Chain Metrics Dashboard
