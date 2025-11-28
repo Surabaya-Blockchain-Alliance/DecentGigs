@@ -23,12 +23,11 @@ Everything that matters lives on Cardano. No databases, no admins, no custody.
 | Feature                      | Description                                                                 | On-Chain |
 |------------------------------|-----------------------------------------------------------------------------|----------|
 | Job Posting & Bidding        | Post jobs, receive bids with proposals                                      | Yes      |
-| Atala PRISM DID + Selective KYC | Verifiable Credentials for identity & skills                           | Yes      |
-| Permanent Reputation System  | Score = (jobs completed × avg rating × timeliness) – immutable         | Yes      |
-| Proof-of-Work Verification   | Deliverable hash submitted → employer verifies → auto-release          | Yes      |
-| Milestone Escrow             | Funds locked in Aiken validator, released only on milestone approval   | Yes      |
-| Dispute Resolution           | Community jury staking or appointed arbitrators                        | Yes      |
-| Private Reviews              | Only winning bidder can review (zero-knowledge proof)                  | Yes      |
+| Atala PRISM DID + Selective KYC | Verifiable Credentials for identity & skills                             | Yes      |
+| Permanent Reputation System  | Score = (jobs completed × avg rating × timeliness) – immutable              | Yes      |
+| Proof-of-Work Verification   | Deliverable hash submitted → employer verifies → auto-release              | Yes      |
+| Milestone Escrow             | Funds locked in Aiken validator, released only on milestone approval       | Yes      |
+| Private Reviews              | Only winning bidder can review                                            | Yes      |
 
 
 **Full Tech Stack**
