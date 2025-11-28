@@ -1,6 +1,6 @@
 # DecentGigs Workflow Documentation
 
-Complete guide for the DecentGigs milestone-based escrow platform on Cardano.
+guide for the DecentGigs milestone-based escrow platform on Cardano.
 
 ## 📋 Table of Contents
 
