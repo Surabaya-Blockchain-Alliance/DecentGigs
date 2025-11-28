@@ -1,19 +1,41 @@
 import { useState } from 'react';
+import { useTheme } from './ThemeProvider';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
-import { Plus, Search, Wallet, FileText, Clock, CheckCircle, Sparkles } from 'lucide-react';
-import { Job } from '../App';
+import { Plus, Search, Wallet, FileText, Clock, CheckCircle, Sparkles, X, User } from 'lucide-react';
+import { P2PChat } from './P2PChat'; // Import the new P2P Chat component
+import { AppHeader } from './AppHeader'; // Import AppHeader
+import { Footer } from './Footer'; // Import Footer
+
+// Re-defining Job interface for self-containment
+export interface Job {
+  id: string;
+  title: string;
+  description: string;
+  budget: number;
+  status: 'open' | 'in-progress' | 'completed';
+  employer: string;
+  freelancer?: string;
+  bids?: number;
+}
+
 
 interface EmployerDashboardProps {
   onJobSelect: (job: Job) => void;
+  onGetStarted: () => void;
+  onShowProfile: () => void;
 }
 
-export function EmployerDashboard({ onJobSelect }: EmployerDashboardProps) {
+export function EmployerDashboard({ onJobSelect, onGetStarted, onShowProfile }: EmployerDashboardProps) {
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === 'dark';
   const [showCreateJob, setShowCreateJob] = useState(false);
+  const [newJob, setNewJob] = useState({ title: '', description: '', budget: 0 });
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null); // State to track selected job for detail view
 
   const mockJobs: Job[] = [
     {
@@ -21,195 +43,164 @@ export function EmployerDashboard({ onJobSelect }: EmployerDashboardProps) {
       title: 'Build React Dashboard',
       description: 'Need a modern dashboard with charts and analytics',
       budget: 500,
-      status: 'open',
-      employer: 'addr1qxy...',
-      bids: 7,
+      status: 'in-progress',
+      employer: 'addr1employer1',
+      freelancer: 'addr1freelancer1',
     },
     {
       id: '2',
-      title: 'Smart Contract Audit',
-      description: 'Security audit for Aiken validator contract',
+      title: 'Plutus Smart Contract Audit',
+      description: 'Audit a simple P2P escrow contract written in Aiken',
       budget: 1200,
-      status: 'in-progress',
-      employer: 'addr1qxy...',
-      freelancer: 'addr1abc...',
+      status: 'open',
+      employer: 'addr1employer1',
+      bids: 5,
     },
     {
       id: '3',
-      title: 'Logo Design',
-      description: 'Modern logo for DeFi project',
-      budget: 300,
+      title: 'Technical Writer for Whitepaper',
+      description: 'Write a comprehensive whitepaper for our new DeFi protocol',
+      budget: 800,
       status: 'completed',
-      employer: 'addr1qxy...',
-      freelancer: 'addr1xyz...',
+      employer: 'addr1employer1',
+      freelancer: 'addr1freelancer2',
     },
   ];
 
+  const rootClass = isDarkMode ? 'bg-[#0a0a0a] text-white' : 'bg-white text-gray-900';
+  const cardClass = isDarkMode ? 'bg-white/5 border border-primary/30' : 'bg-gray-100 border border-gray-300';
+  const jobCardClass = isDarkMode ? 'bg-white/5 border border-white/10 hover:bg-white/10' : 'bg-white border border-gray-200 hover:bg-gray-50';
+  const inputClass = isDarkMode ? 'bg-white/10 border-white/30 text-white' : 'bg-gray-100 border-gray-300 text-gray-900';
+  const textForegroundClass = isDarkMode ? 'text-white' : 'text-gray-900';
+  const textMutedClass = isDarkMode ? 'text-white/70' : 'text-gray-600';
+
+  const formatAddress = (address: string) => `${address.slice(0, 8)}...${address.slice(-4)}`;
+
+  const getStatusVariant = (status: Job['status']): 'default' | 'secondary' | 'outline' => {
+    switch (status) {
+      case 'open':
+        return 'default';
+      case 'in-progress':
+        return 'secondary';
+      case 'completed':
+        return 'outline';
+      default:
+        return 'outline';
+    }
+  };
+
+  const handleCreateJob = () => {
+    console.log('Job Created:', newJob);
+    // Logic to add job to database goes here
+    setShowCreateJob(false);
+    setNewJob({ title: '', description: '', budget: 0 });
+  };
+
+  const handleJobSelect = (job: Job) => {
+    setSelectedJob(job);
+    onJobSelect(job); // Delegate to App component to show detail view
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-foreground">Employer Dashboard</h2>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 border border-primary/30 bg-primary/5 rounded-lg">
-                <Wallet className="w-4 h-4 text-primary" />
-                <span className="text-foreground">125.5 ADA</span>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-full" />
-            </div>
+    <div className={`min-h-screen ${rootClass} transition-colors flex flex-col`}>
+      <AppHeader
+        onGetStarted={onGetStarted}
+        onShowProfile={onShowProfile}
+        isDarkMode={isDarkMode}
+        onToggleTheme={toggleTheme}
+      />
+      <div className="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+        {/* Main Content Area */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className={`text-3xl font-bold ${textForegroundClass}`}>Employer Dashboard</h2>
+          <div className='flex items-center space-x-3'>
+            <Button onClick={() => setShowCreateJob(true)} className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+              <Plus className="w-5 h-5 mr-2" /> Post New Job
+            </Button>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Active Jobs</p>
-                <h2 className="text-foreground">3</h2>
-              </div>
-              <FileText className="w-8 h-8 text-primary/50" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-secondary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Total Bids</p>
-                <h2 className="text-foreground">23</h2>
-              </div>
-              <Clock className="w-8 h-8 text-secondary/50" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-primary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">In Progress</p>
-                <h2 className="text-foreground">1</h2>
-              </div>
-              <Clock className="w-8 h-8 text-primary/50" />
-            </div>
-          </Card>
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-secondary/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted-foreground">Completed</p>
-                <h2 className="text-foreground">8</h2>
-              </div>
-              <CheckCircle className="w-8 h-8 text-secondary/50" />
-            </div>
-          </Card>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input placeholder="Search your jobs..." className="pl-10 bg-input/30" />
-            </div>
-          </div>
-          <Button onClick={() => setShowCreateJob(!showCreateJob)} className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-            <Plus className="w-4 h-4 mr-2" />
-            Create Job
-          </Button>
-        </div>
-
-        {/* Create Job Form */}
+        {/* Create Job Modal/Form */}
         {showCreateJob && (
-          <Card className="p-6 mb-6 bg-card/50 backdrop-blur-sm border-primary/30">
-            <h3 className="mb-4 text-foreground">Create New Job</h3>
-            <div className="space-y-4">
+          <Card className={`p-6 mb-8 ${cardClass} shadow-xl`}>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className={`text-xl font-semibold ${textForegroundClass}`}>Post a New Job</h3>
+              <Button variant="ghost" size="icon" onClick={() => setShowCreateJob(false)}>
+                <X className={`w-5 h-5 ${textForegroundClass}`} />
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-foreground">Job Title</Label>
-                <Input placeholder="e.g. Build a responsive landing page" className="bg-input/30" />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-foreground">Description</Label>
-                <Textarea 
-                  placeholder="Describe the project requirements, deliverables, and timeline..."
-                  rows={4}
-                  className="bg-input/30"
+                <Label htmlFor="title" className={textForegroundClass}>Job Title</Label>
+                <Input
+                  id="title"
+                  value={newJob.title}
+                  onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                  className={inputClass}
                 />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-foreground">Budget (ADA)</Label>
-                  <Input type="number" placeholder="500" className="bg-input/30" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground">Category</Label>
-                  <Input placeholder="Development" className="bg-input/30" />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="budget" className={textForegroundClass}>Budget (ADA)</Label>
+                <Input
+                  id="budget"
+                  type="number"
+                  value={newJob.budget > 0 ? newJob.budget : ''}
+                  onChange={(e) => setNewJob({ ...newJob, budget: parseFloat(e.target.value) || 0 })}
+                  className={inputClass}
+                />
               </div>
-
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-foreground">Listing Fee: 2 ADA</p>
-                    <p className="text-muted-foreground">Jobs appear instantly on-chain</p>
-                  </div>
-                  <div className="px-4 py-2 border border-primary bg-primary/20 rounded-lg text-primary">
-                    2 ADA
-                  </div>
-                </div>
+              <div className="space-y-2 col-span-1 md:col-span-2">
+                <Label htmlFor="description" className={textForegroundClass}>Description</Label>
+                <Textarea
+                  id="description"
+                  value={newJob.description}
+                  onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                  className={inputClass}
+                />
               </div>
-
-              <div className="flex gap-3">
-                <Button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90">Pay & Publish Job</Button>
-                <Button variant="outline" onClick={() => setShowCreateJob(false)}>
-                  Cancel
-                </Button>
-              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <Button onClick={handleCreateJob} className="bg-gradient-to-r from-primary to-secondary hover:opacity-90" disabled={!newJob.title || !newJob.description || newJob.budget <= 0}>
+                Post Job
+              </Button>
             </div>
           </Card>
         )}
 
-        {/* Jobs List */}
-        <div className="space-y-4">
-          <h3 className="text-foreground">Your Jobs</h3>
+        {/* Job Listings */}
+        <div className="space-y-6">
+          <h3 className={`text-2xl font-semibold border-b pb-2 ${isDarkMode ? 'border-white/10' : 'border-gray-200'} ${textForegroundClass}`}>Your Active Jobs</h3>
+          
           {mockJobs.map((job) => (
             <Card 
               key={job.id}
-              className="p-6 cursor-pointer bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all"
-              onClick={() => onJobSelect(job)}
+              className={`p-6 cursor-pointer transition-all ${jobCardClass}`}
+              onClick={() => handleJobSelect(job)}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <h3 className="text-foreground">{job.title}</h3>
-                    <Badge variant={
-                      job.status === 'open' ? 'default' : 
-                      job.status === 'in-progress' ? 'secondary' : 
-                      'outline'
-                    }>
+                    <h3 className={textForegroundClass}>{job.title}</h3>
+                    <Badge variant={getStatusVariant(job.status)} className={`capitalize ${isDarkMode ? '' : 'text-gray-900 border-gray-300'}`}>
                       {job.status}
                     </Badge>
                   </div>
-                  <p className="text-muted-foreground mb-3">{job.description}</p>
-                  <div className="flex items-center gap-6 text-muted-foreground flex-wrap">
-                    <span className="text-primary">{job.budget} ADA</span>
-                    {job.bids && <span>{job.bids} Bids</span>}
-                    {job.freelancer && <span>Freelancer: {job.freelancer.slice(0, 12)}...</span>}
+                  <p className={textMutedClass + ' mb-3'}>{job.description}</p>
+                  <div className={`flex items-center gap-6 flex-wrap ${textMutedClass}`}>
+                    <span className="text-primary font-semibold">{job.budget} ADA</span>
+                    {job.bids && <span className={textMutedClass}>{job.bids} Bids</span>}
+                    {job.freelancer && <span className={textMutedClass}>Freelancer: {formatAddress(job.freelancer)}</span>}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-lg" />
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-primary/80" />
+                </div>
               </div>
             </Card>
           ))}
         </div>
       </div>
+      <Footer isDarkMode={isDarkMode} />
     </div>
   );
 }
